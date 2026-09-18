@@ -1,0 +1,17 @@
+{
+  "name": "ayno-store-production-v4",
+  "version": "4.0.0",
+  "private": true,
+  "description": "Ayno Store V4 - Firebase production migration",
+  "scripts": {
+    "serve": "firebase emulators:start",
+    "deploy": "firebase deploy",
+    "deploy:hosting": "firebase deploy --only hosting",
+    "deploy:functions": "firebase deploy --only functions",
+    "deploy:firestore": "firebase deploy --only firestore",
+    "deploy:storage": "firebase deploy --only storage"
+  },
+  "devDependencies": {
+    "firebase-tools": "latest"
+  }
+}
