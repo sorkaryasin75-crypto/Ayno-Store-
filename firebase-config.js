@@ -3,11 +3,12 @@
  * Firebase Console -> Project settings -> Your apps -> Web app.
  * This file contains PUBLIC Firebase client configuration only.
  */
-window.AYNO_FIREBASE_CONFIG = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_FIREBASE_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_FIREBASE_PROJECT_ID",
-  storageBucket: "YOUR_FIREBASE_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "YOUR_FIREBASE_MESSAGING_SENDER_ID",
-  appId: "YOUR_FIREBASE_APP_ID"
+const firebaseConfig = {
+  apiKey: "AIzaSyCvFZ-syNqXV88QffcL96cZZALERrG3a6M",
+  authDomain: "aynostore-531c9.firebaseapp.com",
+  databaseURL: "https://aynostore-531c9-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "aynostore-531c9",
+  storageBucket: "aynostore-531c9.firebasestorage.app",
+  messagingSenderId: "821342686854",
+  appId: "1:821342686854:web:6f33475fe32511dbac8b07"
 };
