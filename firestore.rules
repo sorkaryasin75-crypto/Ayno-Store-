@@ -1,55 +1,135 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    function self(uid) { return signedIn() && request.auth.uid == uid; }
-    function admin() {
-      return signedIn() && exists(/databases/$(database)/documents/admin_users/$(request.auth.uid))
-        && get(/databases/$(database)/documents/admin_users/$(request.auth.uid)).data.status == 'active';
+
+    function signedIn() {
+      return request.auth != null;
     }
 
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    /*
+     * Users
+     */
     match /users/{uid} {
-      allow read: if self(uid) || admin();
-      allow create: if self(uid);
-      allow update: if self(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-        'firstName','lastName','username','photoUrl','languageCode','updatedAt','lastLoginAt','referralCode'
-      ]) || admin();
-      allow delete: if admin();
+      allow read: if isOwner(uid);
+      allow create, update, delete: if false;
     }
 
+    /*
+     * Products
+     */
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    /*
+     * Settings
+     */
+    match /settings/{documentId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    /*
+     * Orders
+     */
+    match /orders/{orderId} {
+      allow read: if signedIn()
+        && resource.data.userId == request.auth.uid;
+
+      allow create, update, delete: if false;
+    }
+
+    /*
+     * Reviews
+     */
+    match /reviews/{reviewId} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid;
+
+      allow update, delete: if false;
+    }
+
+    /*
+     * Notifications
+     */
+    match /notifications/{notificationId} {
+      allow read: if signedIn()
+        && resource.data.userId == request.auth.uid;
+
+      allow update: if signedIn()
+        && resource.data.userId == request.auth.uid;
+
+      allow create, delete: if false;
+    }
+
+    /*
+     * Withdrawals
+     */
+    match /withdrawals/{withdrawalId} {
+      allow read: if signedIn()
+        && resource.data.userId == request.auth.uid;
+
+      allow create, update, delete: if false;
+    }
+
+    /*
+     * Wallet
+     */
     match /wallets/{uid} {
-      allow read: if self(uid) || admin();
-      allow write: if admin();
+      allow read: if isOwner(uid);
+      allow write: if false;
     }
 
-    match /wallet_ledger/{id} {
-      allow read: if signedIn() && (resource.data.userId == request.auth.uid || admin());
-      allow write: if admin();
+    /*
+     * Wallet ledger
+     */
+    match /wallet_ledger/{ledgerId} {
+      allow read: if signedIn()
+        && resource.data.userId == request.auth.uid;
+
+      allow write: if false;
     }
 
-    match /products/{id} { allow read: if true; allow write: if admin(); }
-    match /settings/{id} { allow read: if true; allow write: if admin(); }
+    /*
+     * Transfers
+     */
+    match /transfers/{transferId} {
+      allow read: if signedIn()
+        && (
+          resource.data.senderId == request.auth.uid ||
+          resource.data.receiverId == request.auth.uid
+        );
 
-    match /orders/{id} {
-      allow read: if signedIn() && (resource.data.userId == request.auth.uid || admin());
-      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if admin();
+      allow create, update, delete: if false;
     }
 
-    match /withdrawals/{id} {
-      allow read: if signedIn() && (resource.data.userId == request.auth.uid || admin());
-      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if admin();
+    /*
+     * Audit logs
+     */
+    match /audit_logs/{logId} {
+      allow read, write: if false;
     }
 
-    match /transfers/{id} { allow read: if signedIn() && (resource.data.senderId == request.auth.uid || resource.data.receiverId == request.auth.uid || admin()); allow write: if admin(); }
-    match /reviews/{id} { allow read: if true; allow create: if signedIn() && request.resource.data.userId == request.auth.uid; allow update, delete: if signedIn() && (resource.data.userId == request.auth.uid || admin()); }
-    match /coupons/{id} { allow read: if admin(); allow write: if admin(); }
-    match /notifications/{id} { allow read: if signedIn() && (resource.data.userId == request.auth.uid || admin()); allow update: if signedIn() && resource.data.userId == request.auth.uid; allow create, delete: if admin(); }
-    match /verification_requests/{id} { allow read: if signedIn() && (resource.data.userId == request.auth.uid || admin()); allow create: if signedIn() && request.resource.data.userId == request.auth.uid; allow update, delete: if admin(); }
-    match /provider_transactions/{id} { allow read, write: if admin(); }
-    match /audit_logs/{id} { allow read: if admin(); allow write: if false; }
-    match /admin_users/{uid} { allow read: if admin() || self(uid); allow write: if admin(); }
-    match /idempotency_keys/{id} { allow read, write: if false; }
+    /*
+     * Admin users
+     */
+    match /admin_users/{uid} {
+      allow read, write: if false;
+    }
+
+    /*
+     * Default deny
+     */
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }
