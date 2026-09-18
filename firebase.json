@@ -1,0 +1,20 @@
+{
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs20"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "functions/**", "README.md", "FIREBASE_SETUP.md"],
+    "rewrites": [
+      { "source": "/api/**", "function": { "functionId": "api", "region": "us-central1" } }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
+}
