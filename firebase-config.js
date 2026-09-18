@@ -3,6 +3,7 @@
  * Firebase Console -> Project settings -> Your apps -> Web app.
  * This file contains PUBLIC Firebase client configuration only.
  */
+window.AYNO_FIREBASE_CONFIG = {
 const firebaseConfig = {
   apiKey: "AIzaSyCvFZ-syNqXV88QffcL96cZZALERrG3a6M",
   authDomain: "aynostore-531c9.firebaseapp.com",
